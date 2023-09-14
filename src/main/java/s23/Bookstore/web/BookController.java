@@ -5,6 +5,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -12,12 +15,15 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import s23.Bookstore.domain.Book;
 import s23.Bookstore.domain.BookRepository;
+import s23.Bookstore.domain.CategoryRepository;
 
 @Controller
 public class BookController {
 	
 	@Autowired
 	private BookRepository repository; 
+	@Autowired
+	private CategoryRepository crepository; 
 	
 	private static final Logger log = LoggerFactory.getLogger(BookController.class);
 	
@@ -37,11 +43,16 @@ public class BookController {
 	public String addBook(Model model){
 		log.info("lisätään kirja");
 	 model.addAttribute("book", new Book());
+	 model.addAttribute("categories", crepository.findAll());
 	 return "addbook";
 	}
 	
 	@RequestMapping(value = "/save", method = RequestMethod.POST)
-	public String save(Book book){
+	public String save(@Validated @ModelAttribute("book") Book book, BindingResult bindingResult, Model model) {
+		if (bindingResult.hasErrors()) {
+			model.addAttribute("edit", book);
+			model.addAttribute("categories", crepository.findAll());
+		}
 	 repository.save(book);
 	 return "redirect:booklist";
 	}
@@ -53,8 +64,10 @@ public class BookController {
 	}
 	
 	@RequestMapping(value = "/edit/{id}")
-	public String showModBook(@PathVariable("id") Long id, Model model)
-	{ model.addAttribute("book", repository.findById(id));
+	public String showModBook(@PathVariable("id") Long id, Model model) { 
+		model.addAttribute("book", repository.findById(id));
+		model.addAttribute("categories", crepository.findAll());
+
 	return "editbook";
 	}
 

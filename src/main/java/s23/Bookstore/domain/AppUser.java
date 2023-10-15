@@ -7,8 +7,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
-@Entity(name= "users")
-@Table(name= "UserTable")
+@Entity
+@Table(name= "app_user")
 public class AppUser {
 	
 	@Id
@@ -18,9 +18,9 @@ public class AppUser {
 	// Username with unique constraint
 	@Column(name = "username", nullable = false, unique = true)
 	private String username;
-	@Column(name = "password", nullable = false)
+	@Column(name = "pashword_hash", nullable = false)
 	private String passwordHash;
-	@Column(name = "role", nullable = false)
+	@Column(name = "user_role", nullable = false)
 	private String role;
 	
 	
